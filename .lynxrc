@@ -190,7 +190,7 @@ keypad_mode=LINKS_ARE_NOT_NUMBERED
 #    Default Binding
 #    Alternate Bindings
 #    Bash-like Bindings
-lineedit_mode=Default Binding
+lineedit_mode=Bash-like Bindings
 
 # The following allow you to define sub-bookmark files and descriptions.
 # The format is multi_bookmark<capital_letter>=<filename>,<description>
