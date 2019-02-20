@@ -1,0 +1,3 @@
+# For copy and paste in specific env. (like mutt. Without this settings, You can't copy in mutt.)
+defbce on
+term screen-bce
