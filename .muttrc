@@ -8,6 +8,7 @@ set send_charset="us-ascii:iso-8859-1:iso-2022-jp:utf-8"
 
 set folder="imaps://xxxxxx@gmail.com@imap.gmail.com"
 set imap_user="xxxxxx@gmail.com"
+set imap_pass="xxxxxx"
 set smtp_url="smtps://xxxxxx@gmail.com@smtp.gmail.com"
 set spoolfile="imaps://xxxxxx@gmail.com@imap.gmail.com/INBOX"
 send-hook . 'my_hdr From: xxxxxx@gmail.com'
