@@ -19,5 +19,9 @@ export PS1="\[\e[33m\]\W\[\e[m\]\[\e[33m\]\\$\[\e[m\] "
 #alias l="~/login.exp"
 alias ls='ls -FG'
 alias findn='find ./ -name'
+
+# Functions
+function grepr(){ command grep -r ${1} ./; }
+
 # Change Color for ls -G -> dir color blue to cyan
 export LSCOLORS=gxfxcxdxbxegedabagacad
