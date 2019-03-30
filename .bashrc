@@ -13,7 +13,8 @@ shopt -s histappend
 export HISTIGNORE="ls:ps:history"
 
 # Show only current directory on bash prompt.
-export PS1='\W $ '
+export PS1="\[\e[33m\]\W\[\e[m\]\[\e[33m\]\\$\[\e[m\] "
 
 # Aliases
 #alias l="~/login.exp"
+alias ls='ls -FG'
