@@ -23,7 +23,7 @@ alias ls='ls -FG'
 # Functions
 function grepr(){ command grep -r ${1} ./; }
 
-# Find file from the current directory (and subdirectories) and open with vim
+# Find files from the current directory (and subdirectories) and open with vim
 function findvim(){
     findResutl=$(find . -name ${1} | cut -c 3- )
     echo "$findResutl" | nl
