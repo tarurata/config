@@ -18,10 +18,18 @@ export PS1="\[\e[33m\]\W\[\e[m\]\[\e[33m\]\\$\[\e[m\] "
 # Aliases
 #alias l="~/login.exp"
 alias ls='ls -FG'
-alias findn='find ./ -name'
+#alias findn='find ./ -name'
 
 # Functions
 function grepr(){ command grep -r ${1} ./; }
+
+# Find file from the current directory (and subdirectories) and open with vim
+function findvim(){
+    findResutl=$(find . -name ${1} | cut -c 3- )
+    echo "$findResutl" | nl
+    read -p "Which file?(Enter the number): " input
+    echo "$findResutl" | awk -v rownum=$input 'NR==rownum'| xargs -o vim
+}
 
 # Change Color for ls -G -> dir color blue to cyan
 export LSCOLORS=gxfxcxdxbxegedabagacad
