@@ -1,0 +1,12 @@
+#termcapinfo xterm* ti@:te@
+#shell -$SHELL
+#defshell -bash
+shell ${SHELL}
+caption always "%n(%t) : %C"
+defscrollback 4098
+startup_message off 
+ #FYI: https://qiita.com/trapple/items/8ad1b0a7c4fa5b8341b0
+ # $ brew tap homebrew/dupes
+ # $ brew install screen
+defbce on
+term xterm-256color
