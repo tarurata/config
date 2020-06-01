@@ -1,3 +1,18 @@
 # For copy and paste in specific env. (like mutt. Without this settings, You can't copy in mutt.)
+# defbce on
+# term screen-bce
+
+startup_message off
+vbell off
+
+# 色
+# オレンジが赤になるとかならscreenが256色対応じゃないかも
+# FYI: https://qiita.com/trapple/items/8ad1b0a7c4fa5b8341b0
+# $ brew tap homebrew/dupes
+# $ brew install screen
 defbce on
-term screen-bce
+term xterm-256color
+termcapinfo xterm* ti@:te@
+# Remove default key binding for screenlock (Ctrla + x)
+bind x
+bind ^x
