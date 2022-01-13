@@ -1,27 +1,22 @@
+source /etc/bashrc
+source /etc/bashrc_Apple_Terminal
 export LANG=ja_JP.UTF-8
 export PATH=/usr/local/opt/python/libexec/bin:$PATH:/Users/muratawataru/.nodebrew/current/bin
-export BROWSER=lynx
+export PATH=$HOME/.nodebrew/current/bin:$PATH
+export DOCKER_CONTENT_TRUST=1
+export BASH_SILENCE_DEPRECATION_WARNING=1
 
 # Aliases
-alias l="~/login.exp"
 alias ls='ls -FG'
-#alias findn='find . -name'
-
-# Functions
-function grepr(){ command grep -r $"{1}" ./; }
-
-# Find file from the current directory (and subdirectories) and open with vim
-function fvim(){
-    findResutl="$(find . -name "${1}" )"
-    echo "$findResutl" | nl
-    read -p "Which file?(Enter the number): " input
-    echo "$findResutl" | awk -v rownum=$input 'NR==rownum'| xargs -o vim
-}
+alias sed='gsed'
 
 # For bash history settings
-export HISTTIMEFORMAT="%h %d %H:%M:%S "
+export HISTTIMEFORMAT='%F %T '
 export HISTSIZE=10000
 export HISTFILESIZE=10000
+
+# Share the command history with multiple prompt
+export PROMPT_COMMAND="history -a; history -c; history -r; $PROMPT_COMMAND"
 
 # To append commands to the history file, rather than overwrite it.
 shopt -s histappend
@@ -39,8 +34,15 @@ defaults write "Apple Global Domain" com.apple.mouse.scaling 11
 
 [ -f ~/.fzf.bash ] && source ~/.fzf.bash
 
-fvim() {
-  files=$(git ls-files) &&
-  selected_files=$(echo "$files" | fzf -m --preview 'head -100 {}') &&
-  vim $selected_files
-}
+export PATH="/usr/local/opt/libxml2/bin:$PATH"
+source /Users/wata/.phpbrew/bashrc
+
+# Start tmux at the same time with terminal.
+tmux_count=$(ps -ax | grep '[t]mux' | wc -l)
+if [ $SHLVL = 1 ]; then
+  if [ $tmux_count = 0 ]; then
+    tmux -u new-session
+  elif [ $tmux_count = 1 ]; then
+    tmux -u attach
+  fi
+fi
