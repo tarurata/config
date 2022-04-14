@@ -1,68 +1,55 @@
+call plug#begin('~/.vim/plugged')
 
-"-----------https://github.com/VundleVim/Vundle.Vim#quick-start-----------
-"
-"How to use
-"git clone https://github.com/VundleVim/Vundle.vim.git ~/.vim/bundle/Vundle.vim
-"Launch vim and run :PluginInstall
-"To install from command line: vim +PluginInstall +qall
+Plug 'scrooloose/nerdtree'
+Plug 'jistr/vim-nerdtree-tabs'
+Plug 'scrooloose/nerdtree'
+Plug 'mattn/emmet-vim'
+Plug 'jistr/vim-nerdtree-tabs'
+Plug 'rhysd/vim-clang-format'
+Plug 'justmao945/vim-clang'
+Plug 'cohama/lexima.vim'
+Plug 'posva/vim-vue'
+Plug 'ctrlpvim/ctrlp.vim'
+Plug 'tpope/vim-surround'
+Plug 'scrooloose/nerdcommenter'
+Plug 'jwalton512/vim-blade'
+Plug 'ap/vim-css-color'
+Plug 'tomasr/molokai'
+Plug 'junegunn/fzf'
+Plug 'junegunn/fzf.vim'
+Plug 'easymotion/vim-easymotion'
 
-set nocompatible              " be iMproved, require
-filetype off                  " required
+"if has('nvim')
+  "Plug 'Shougo/deoplete.nvim', { 'do': ':UpdateRemotePlugins' }
+"else
+  "Plug 'Shougo/deoplete.nvim'
+  "Plug 'roxma/nvim-yarp'
+  "Plug 'roxma/vim-hug-neovim-rpc'
+"endif
 
-" set the runtime path to include Vundle and initialize
-set rtp+=~/.vim/bundle/Vundle.vim
-call vundle#begin()
-" alternatively, pass a path where Vundle should install plugins
-"call vundle#begin('~/some/path/here')
-
-" let Vundle manage Vundle, required
-Plugin 'VundleVim/Vundle.vim'
-Plugin 'scrooloose/nerdtree'
-Plugin 'mattn/emmet-vim'
-Plugin 'jistr/vim-nerdtree-tabs'
-Plugin 'rhysd/vim-clang-format'
-Plugin 'justmao945/vim-clang'
-" うぶんつでエラーが出る
-Plugin 'cohama/lexima.vim'
-Plugin 'posva/vim-vue'
-Plugin 'ctrlpvim/ctrlp.vim'
-Plugin 'tpope/vim-surround'
-Plugin 'scrooloose/nerdcommenter'
-Plugin 'jwalton512/vim-blade'
-Plugin 'ap/vim-css-color'
-Plugin 'tomasr/molokai'
-
-" All of your Plugins must be added before the following line
-call vundle#end()            " required
-filetype plugin indent on    " required
-" To ignore plugin indent changes, instead use:
-"filetype plugin on
-"
-" Brief help
-" :PluginList       - lists configured plugins
-" :PluginInstall    - installs plugins; append `!` to update or just :PluginUpdate
-" :PluginSearch foo - searches for foo; append `!` to refresh local cache
-" :PluginClean      - confirms removal of unused plugins; append `!` to auto-approve removal
-"
-" see :h vundle for more details or wiki for FAQ
-" Put your non-Plugin stuff after this line
-
-"-----------https://github.com/VundleVim/Vundle.Vim#quick-start-----------
+call plug#end()
 
 "Settings for Plugin.
 let g:NERDTreeWinSize=15
-let g:neocomplete#enable_at_startup = 1
-"
-autocmd vimenter * NERDTree
+"let g:neocomplete#enable_at_startup = 1
+
+set completeopt+=noinsert
+let g:deoplete#enable_at_startup = 1
+"let g:deoplete#enable_at_startup = 1
+"let g:deoplete#auto_completion_start_length = 1
+
+"autocmd vimenter * NERDTree
 nnoremap <silent><C-e> :NERDTreeToggle<CR>
 
+"Setting for Plugin calendar.vim
+let g:calendar_google_calendar = 1
+let g:calendar_google_task = 1
+
 "Configuration for encoding.
-set encoding=utf-8
 set fileencodings=utf-8,iso-2022-jp,euc-jp,sjis
 
 "When you start new line, make the same indent in new line with previous one. 
 set ai
-
 
 "When you start new line, make high level auto indentation.
 set si
@@ -100,7 +87,10 @@ set smartcase
 set number
 
 " Turn on file backups
+" no swap file
 set backup
+" no backup file(with tilde)
+set nobackup
 
 " Don't line wrap mid-word.
 set lbr
@@ -118,8 +108,8 @@ set expandtab
 set smarttab
 
 " Make a tab equal to 4 spaces
-set shiftwidth=4
-set tabstop=4
+set shiftwidth=2
+set tabstop=2
 
 " Do not make swap file
 set noswapfile
@@ -131,7 +121,6 @@ let mapleader = "\<Space>"
 map <leader>w :w!<cr>
 " Quickly open the file.
 nnoremap <Leader>o :CtrlP<CR>
-set clipboard=unnamedplus
 " Quickly yank and paste with OS clip board. 
 vmap <Leader>y "+y
 vmap <Leader>d "+d
@@ -143,23 +132,27 @@ vmap <Leader>P "+P
 :imap jk <Esc>
 :imap kj <Esc>
 
+" s{char}{char} to move to {char}{char}
+map <leader>s <Plug>(easymotion-bd-f2)
+nmap <leader>s <Plug>(easymotion-overwin-f2)
+
+" Move to line
+map <leader>l <Plug>(easymotion-bd-jk)
+nmap <leader>l <Plug>(easymotion-overwin-line)
+
 " If there are more than 1 tag matching file, Show the list.(with ctags)
 nnoremap <C-]> g<C-]>
 
 " For html tag jump (<div>-></div>)
-" You can check where the directory is with ":echo $VIMRUNTIME" on vim.
-":source /usr/local/share/vim/vim81/macros/matchit.vim
+:runtime macros/matchit.vim
 
-
-" For html tag jump (<div>-></div>)
-":source /usr/local/share/vim/vim81/macros/matchit.vim
-
-" For html, js, css and so on. Make tabstop=2
+" For html, js, css and so on. Make tabstop=4
 function! s:javascript_filetype_settings()
     setlocal tabstop=2
     setlocal shiftwidth=2
     setlocal cindent
 endfunction
+
 autocmd FileType javascript call s:javascript_filetype_settings()
 
 function! s:html_filetype_settings()
@@ -174,5 +167,26 @@ function! s:css_filetype_settings()
     setlocal shiftwidth=2
     setlocal cindent
 endfunction
+
+function! s:python_filetype_settings()
+    setlocal tabstop=4
+    setlocal shiftwidth=4
+    setlocal cindent
+endfunction
+
+function! s:awk_filetype_settings()
+    setlocal tabstop=4
+    setlocal shiftwidth=4
+    "set nosmarttab
+    "set nosmartindent
+    "set noautoindent
+    "setlocal cindent
+endfunction
+
+autocmd FileType python  call s:python_filetype_settings()
 autocmd FileType css  call s:css_filetype_settings()
 autocmd FileType sass call s:css_filetype_settings()
+autocmd FileType awk call s:awk_filetype_settings()
+
+" set 256 color
+set t_Co=256
