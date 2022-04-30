@@ -3,17 +3,23 @@ source /etc/bashrc_Apple_Terminal
 export LANG=ja_JP.UTF-8
 export PATH=/usr/local/opt/python/libexec/bin:$PATH:/Users/muratawataru/.nodebrew/current/bin
 export PATH=$HOME/.nodebrew/current/bin:$PATH
+export PATH=/usr/local/opt/grep/libexec/gnubin:$PATH
 export DOCKER_CONTENT_TRUST=1
 export BASH_SILENCE_DEPRECATION_WARNING=1
+export GPG_TTY=$(tty)
 
 # Aliases
 alias ls='ls -FG'
 alias sed='gsed'
+alias xargs='gxargs'
+#alias awk='gawk'
+# Count the number of characters with html tags.
+alias cchar='pbpaste | sed -E "s/<[^>]*>//g" | tr -d "\n" | wc -c'
 
 # For bash history settings
 export HISTTIMEFORMAT='%F %T '
-export HISTSIZE=10000
-export HISTFILESIZE=10000
+export HISTSIZE=100000
+export HISTFILESIZE=100000
 
 # Share the command history with multiple prompt
 export PROMPT_COMMAND="history -a; history -c; history -r; $PROMPT_COMMAND"
@@ -47,7 +53,22 @@ if [ $SHLVL = 1 ]; then
   fi
 fi
 
-# https://linuxfan.info/disable-ctrl-s
+# The next line updates PATH for the Google Cloud SDK.
+if [ -f '/Users/wata/google-cloud-sdk/path.bash.inc' ]; then . '/Users/wata/google-cloud-sdk/path.bash.inc'; fi
+
+# The next line enables shell command completion for gcloud.
+if [ -f '/Users/wata/google-cloud-sdk/completion.bash.inc' ]; then . '/Users/wata/google-cloud-sdk/completion.bash.inc'; fi
+
+shellgei() { 
+  if [ -z $1 ]; then
+    echo 'Put question number as 1st arg.' >&2;
+  else
+    # eオプションをつけると、pbpasteの結果に\nが含まれる場合、改行されてしまうので、sedで対応
+    echo -e "今日のシェル芸\n💎$1💎\n `pbpaste | sed 's/\\\n/\\\\\\\n/g'` \nhttps://amzn.to/3HjYoe1" 
+  fi
+}
+
+# Make i-search available. https://linuxfan.info/disable-ctrl-s
 if [[ -t 0 ]]; then
   stty stop undef
   stty start undef
