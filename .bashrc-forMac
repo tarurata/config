@@ -46,3 +46,9 @@ if [ $SHLVL = 1 ]; then
     tmux -u attach
   fi
 fi
+
+# https://linuxfan.info/disable-ctrl-s
+if [[ -t 0 ]]; then
+  stty stop undef
+  stty start undef
+fi
