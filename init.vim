@@ -88,14 +88,14 @@ let g:NERDTreeWinSize=15
 autocmd BufWritePre *.py, call execute('LspDocumentFormatSync') 
 
 inoremap <silent><expr> <TAB>
-      \ pum#visible() ? '<Cmd>call pum#map#insert_relative(+1)<CR>' :
+      \ pum#visible() ? '<Cmd>call pum#map#confirm()<CR>' :
       \ (col('.') <= 1 <Bar><Bar> getline('.')[col('.') - 2] =~# '\s') ?
       \ '<TAB>' : ddc#manual_complete()
 inoremap <C-n>   <Cmd>call pum#map#select_relative(+1)<CR>
 inoremap <C-p>   <Cmd>call pum#map#select_relative(-1)<CR>
 
 " Settings for lsp. Show the result of static analysis or linter.
-set completeopt+=noinsert
+"set completeopt+=noinsert
 let g:lsp_diagnostics_enabled = 1
 let g:lsp_diagnostics_echo_cursor = 1
 let g:lsp_text_edit_enabled = 0
