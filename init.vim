@@ -1,11 +1,9 @@
 call plug#begin()
-Plug 'tpope/vim-fugitive'
 Plug 'scrooloose/nerdtree'
 Plug 'mattn/emmet-vim'
 Plug 'ctrlpvim/ctrlp.vim'
 Plug 'cohama/lexima.vim'
 Plug 'tpope/vim-surround'
-Plug 'posva/vim-vue'
 Plug 'scrooloose/nerdcommenter'
 Plug 'jwalton512/vim-blade'
 Plug 'ap/vim-css-color'
@@ -18,9 +16,6 @@ Plug 'vim-denops/denops.vim' " DenoでVimプラグインを開発するための
 Plug 'prabirshrestha/vim-lsp'
 Plug 'mattn/vim-lsp-settings' " vim-lspの設定
 Plug 'mattn/vim-lsp-icons'
-Plug 'hrsh7th/vim-vsnip' " https://zenn.dev/shougo/articles/snippet-plugins-2020
-Plug 'hrsh7th/vim-vsnip-integ'
-Plug 'rafamadriz/friendly-snippets' " 大量のスニペット郡
 Plug 'Shougo/pum.vim' " ポップアップウィンドウを表示するプラグイン
 Plug 'Shougo/ddc-source-around' " カーソル周辺の既出単語を補完するsource
 Plug 'neovim/nvim-lspconfig' " Configuration for Nvim LSP
@@ -31,7 +26,6 @@ Plug 'LumaKernel/ddc-file' " ファイル名を補完するsource
 Plug 'Shougo/ddc-matcher_head' " 入力中の単語を補完の対象にするfilter
 Plug 'Shougo/ddc-sorter_rank' " 補完候補を適切にソートするfilter
 Plug 'Shougo/ddc-converter_remove_overlap' " 補完候補の重複を防ぐためのfilter
-Plug 'matsui54/denops-popup-preview.vim'
 Plug 'Shougo/ddc-ui-pum'
 call plug#end()
 call ddc#custom#patch_global('completionMenu', 'pum.vim')
@@ -61,8 +55,6 @@ call ddc#custom#patch_global('sourceParams', {
       \   'nvim-lsp': { 'kindLabels': { 'Class': 'c' } },
       \ })
 
-call popup_preview#enable()
-autocmd User PumCompleteDone call vsnip_integ#on_complete_done(g:pum#completed_item)
 call ddc#enable()
 
 lua << EOF
@@ -92,16 +84,24 @@ mason_lspconfig.setup_handlers({ function(server_name)
 end })
 EOF
 
-"Settings for Plugin.
 let g:NERDTreeWinSize=15
+autocmd BufWritePre *.py, call execute('LspDocumentFormatSync') 
+
+inoremap <silent><expr> <TAB>
+      \ pum#visible() ? '<Cmd>call pum#map#insert_relative(+1)<CR>' :
+      \ (col('.') <= 1 <Bar><Bar> getline('.')[col('.') - 2] =~# '\s') ?
+      \ '<TAB>' : ddc#manual_complete()
+inoremap <C-n>   <Cmd>call pum#map#select_relative(+1)<CR>
+inoremap <C-p>   <Cmd>call pum#map#select_relative(-1)<CR>
 
 " Settings for lsp. Show the result of static analysis or linter.
 set completeopt+=noinsert
 let g:lsp_diagnostics_enabled = 1
 let g:lsp_diagnostics_echo_cursor = 1
-let g:lsp_text_edit_enabled = 1
+let g:lsp_text_edit_enabled = 0
 let g:lsp_diagnostics_virtual_text_enabled = 0
 highlight link LspErrorHighlight Error
+highlight link LspWarningHighlight Error
 
 set cursorline
 set cursorcolumn
@@ -126,28 +126,12 @@ set shiftwidth=4
 set tabstop=4
 let mapleader = "\<Space>" " Allocate space key to <leader>
 map <leader>w :w!<cr> " Quickly save your file.
-nnoremap <Leader>o :Files<CR> " Quickly open the file with fzf.
+nnoremap <Leader>o :Files<CR>
 nnoremap <Leader>h :History<CR>
 
-" この設定でデフォルトの補完が表示されなくなる
-inoremap <C-n>   <Cmd>call pum#map#insert_relative(+1)<CR>
-inoremap <C-p>   <Cmd>call pum#map#insert_relative(-1)<CR>
-inoremap <C-y>   <Cmd>call pum#map#confirm()<CR>
-inoremap <C-e>   <Cmd>call pum#map#cancel()<CR>
-inoremap <PageDown> <Cmd>call pum#map#insert_relative_page(+1)<CR>
-inoremap <PageUp>   <Cmd>call pum#map#insert_relative_page(-1)<CR>
-
-"For Snippet expand https://github.com/hrsh7th/vim-vsnip
-imap <expr> <C-j>   vsnip#expandable()  ? '<Plug>(vsnip-expand)'         : '<C-j>'
-smap <expr> <C-j>   vsnip#expandable()  ? '<Plug>(vsnip-expand)'         : '<C-j>'
-" Expand or jump to next inputable attribute or something
-imap <expr> <C-l>   vsnip#available(1)  ? '<Plug>(vsnip-expand-or-jump)' : '<C-l>'
-smap <expr> <C-l>   vsnip#available(1)  ? '<Plug>(vsnip-expand-or-jump)' : '<C-l>'
-" Jump forward or backward (#pumのtab complettionと競合するので条件分岐追加 )
-imap <expr> <Tab>   vsnip#jumpable(1)   ? '<Plug>(vsnip-jump-next)'      : pum#visible() ? '<Cmd>call pum#map#confirm()<CR>' : '<Tab>'
-smap <expr> <Tab>   vsnip#jumpable(1)   ? '<Plug>(vsnip-jump-next)'      : pum#visible() ? '<Cmd>call pum#map#confirm()<CR>' : '<Tab>'
-imap <expr> <S-Tab> vsnip#jumpable(-1)  ? '<Plug>(vsnip-jump-prev)'      : '<S-Tab>'
-smap <expr> <S-Tab> vsnip#jumpable(-1)  ? '<Plug>(vsnip-jump-prev)'      : '<S-Tab>'
+nmap <silent> <Leader>ld :LspDefinition<CR>
+nmap <silent> <Leader>lh :LspHover<CR>
+nmap <silent> <Leader>lr :LspReferences<CR>
 
 " Quickly yank and paste with OS clip board. 
 vmap <Leader>y "+y
