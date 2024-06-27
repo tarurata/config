@@ -249,18 +249,3 @@ if argc() == 1 && argv(0) == 'journal'
     autocmd VimEnter * call OpenOrCreateDailyFile()
 endif
 ]], false)
-
-
--- Disable default rules for lexima.vim
-vim.g.lexima_no_default_rules = true
-vim.cmd('call lexima#set_default_rules()')
--- Add custom rule for square brackets. I need this to avoid duplicated spaces in parentheses.
-vim.cmd([[
-call lexima#add_rule({
-    \ 'char': '[',
-    \ 'at': '\[\]',
-    \ 'input': '[',
-    \ 'leave': ']',
-    \ 'except': '\[.*\]'
-})
-]])
