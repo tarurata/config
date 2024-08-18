@@ -1,75 +1,67 @@
--- Begin plug configuration
-vim.cmd [[
-call plug#begin()
-Plug 'mattn/emmet-vim'
-Plug 'ctrlpvim/ctrlp.vim'
-Plug 'cohama/lexima.vim'
-Plug 'tpope/vim-surround'
-Plug 'scrooloose/nerdcommenter'
-Plug 'jwalton512/vim-blade'
-Plug 'ap/vim-css-color'
-Plug 'tomasr/molokai'
-Plug 'junegunn/fzf'
-Plug 'junegunn/fzf.vim'
-Plug 'easymotion/vim-easymotion'
-Plug 'Shougo/ddc.vim'
-Plug 'vim-denops/denops.vim'
-Plug 'prabirshrestha/vim-lsp'
-Plug 'mattn/vim-lsp-settings'
-Plug 'mattn/vim-lsp-icons'
-Plug 'Shougo/pum.vim'
-Plug 'Shougo/ddc-source-around'
-Plug 'neovim/nvim-lspconfig'
-Plug 'williamboman/mason.nvim'
-Plug 'williamboman/mason-lspconfig.nvim'
-Plug 'jose-elias-alvarez/null-ls.nvim'
-Plug 'nvim-lua/plenary.nvim'
-Plug 'Shougo/ddc-source-nvim-lsp'
-Plug 'LumaKernel/ddc-file'
-Plug 'Shougo/ddc-matcher_head'
-Plug 'Shougo/ddc-sorter_rank'
-Plug 'Shougo/ddc-converter_remove_overlap'
-Plug 'Shougo/ddc-ui-pum'
-Plug 'folke/noice.nvim'
-Plug 'MunifTanjim/nui.nvim'
-Plug 'github/copilot.vim'
-Plug 'serenevoid/kiwi.nvim', { 'commit': '47894404ca554d48f4e3f1e0bd59642464ca539f' }
-Plug 'rhysd/vim-startuptime'
-call plug#end()
-]]
+-- Bootstrap lazy.nvim
+local lazypath = vim.fn.stdpath("data") .. "/lazy/lazy.nvim"
+if not (vim.uv or vim.loop).fs_stat(lazypath) then
+  local lazyrepo = "https://github.com/folke/lazy.nvim.git"
+  local out = vim.fn.system({ "git", "clone", "--filter=blob:none", "--branch=stable", lazyrepo, lazypath })
+  if vim.v.shell_error ~= 0 then
+    vim.api.nvim_echo({
+      { "Failed to clone lazy.nvim:\n", "ErrorMsg" },
+      { out, "WarningMsg" },
+      { "\nPress any key to exit..." },
+    }, true, {})
+    vim.fn.getchar()
+    os.exit(1)
+  end
+end
+vim.opt.rtp:prepend(lazypath)
+
+-- Set leader keys
+vim.g.mapleader = " "
+vim.g.maplocalleader = "\\"
+
+-- Setup lazy.nvim
+require("lazy").setup({
+  { "mattn/emmet-vim" },                    -- Emmet for HTML and CSS expansion
+  { "ctrlpvim/ctrlp.vim" },                 -- Fuzzy file finder
+  { "cohama/lexima.vim" },                  -- Auto-close parentheses, quotes, etc.
+  { "tpope/vim-surround" },                 -- Easily delete, change and add surroundings in pairs
+  { "scrooloose/nerdcommenter" },           -- Easy commenting of code for various languages
+  { "ap/vim-css-color" },                   -- Preview colors in source code
+  { "tomasr/molokai" },                     -- Molokai color scheme
+  { "junegunn/fzf" },                       -- Fuzzy finder
+  { "junegunn/fzf.vim" },                   -- Fuzzy finder Vim integration
+  { "easymotion/vim-easymotion" },          -- Vim motions on speed
+  { "Shougo/ddc.vim" },                     -- Dark powered asynchronous completion framework
+  { "vim-denops/denops.vim" },              -- Vim/Neovim plugin framework written in Deno
+--  { "prabirshrestha/vim-lsp" },             -- Async Language Server Protocol plugin
+--  { "mattn/vim-lsp-settings" },             -- Auto configurations for Language Server
+--  { "mattn/vim-lsp-icons" },                -- Icons for vim-lsp
+  { "Shougo/pum.vim" },                     -- Popup menu for Vim
+  { "Shougo/ddc-source-around" },           -- Around source for ddc.vim
+  -- { "Shougo/ddc-source-nvim-lsp" },         -- LSP source for ddc.vim !Obsoleted!
+  { "Shougo/ddc-source-lsp" },              -- LSP source for ddc.vim
+  { "neovim/nvim-lspconfig" },              -- Quickstart configs for Nvim LSP
+  { "williamboman/mason.nvim" },            -- Portable package manager for Neovim
+  { "williamboman/mason-lspconfig.nvim" },  -- Bridge between mason.nvim and lspconfig
+  { "jose-elias-alvarez/null-ls.nvim" },    -- Use Neovim as a language server
+  { "nvim-lua/plenary.nvim" },              -- Lua functions library
+  { "LumaKernel/ddc-file" },                -- File source for ddc.vim
+  { "Shougo/ddc-matcher_head" },            -- Head matcher for ddc.vim
+  { "Shougo/ddc-sorter_rank" },             -- Rank sorter for ddc.vim
+  { "Shougo/ddc-converter_remove_overlap" },-- Overlap remover for ddc.vim
+  { "Shougo/ddc-ui-pum" },                  -- Popup menu UI for ddc.vim
+  { "folke/noice.nvim" },                   -- Highly experimental plugin that replaces the UI for messages, cmdline and the popupmenu
+  { "MunifTanjim/nui.nvim" },               -- UI Component Library for Neovim
+  { "github/copilot.vim" },                 -- GitHub Copilot for Vim
+  { "serenevoid/kiwi.nvim", commit = "47894404ca554d48f4e3f1e0bd59642464ca539f" }, -- Neovim plugin for note-taking and personal wiki
+  { "rhysd/vim-startuptime" },              -- Measure startup time of Vim
+}, {
+  install = { colorscheme = { "molokai" } },
+  checker = { enabled = true },
+})
 
 -- Noice setup
 require("noice").setup()
-
--- DDC settings
-vim.fn['ddc#custom#patch_global']('completionMenu', 'pum.vim')
-vim.fn['ddc#custom#patch_global']('sources', { 'around', 'file' })
--- vim.fn['ddc#custom#patch_global']('sources', { 'nvim-lsp', 'around', 'file' })
-vim.fn['ddc#custom#patch_global']('sourceOptions', {
-  ['_'] = {
-    matchers = { 'matcher_head' },
-    sorters = { 'sorter_rank' },
-    converters = { 'converter_remove_overlap' },
-  },
-  ['nvim-lsp'] = {
-    mark = 'LSP',
-    forceCompletionPattern = '\\.\\w*|:\\w*|->\\w*',
-  },
-  ['around'] = {
-    mark = 'Around',
-  },
-  ['file'] = {
-    mark = 'file',
-    isVolatile = true,
-    forceCompletionPattern = '\\S/\\S*',
-  },
-})
-vim.fn['ddc#custom#patch_global']('ui', 'pum')
-vim.fn['ddc#custom#patch_global']('sourceParams', {
-  ['nvim-lsp'] = { kindLabels = { Class = 'c' } },
-})
-
-vim.fn['ddc#enable']()
 
 -- Mason and LSP settings
 require('mason').setup({
@@ -82,36 +74,86 @@ require('mason').setup({
   }
 })
 
-local null_ls = require("null-ls")
-null_ls.setup({
-  sources = {
-    null_ls.builtins.formatting.black,
-    null_ls.builtins.formatting.isort
-  }
-})
+require('mason-lspconfig').setup()
 
 local nvim_lsp = require('lspconfig')
+local capabilities = vim.lsp.protocol.make_client_capabilities()
+capabilities = require('ddc_source_lsp').make_client_capabilities(capabilities)
+
 require('mason-lspconfig').setup_handlers({
   function(server_name)
-    local opts = {}
-    opts.on_attach = function(_, bufnr)
-      local bufopts = { silent = true, buffer = bufnr }
-      vim.keymap.set('n', 'gi', vim.lsp.buf.implementation, bufopts)
-      vim.keymap.set('n', 'gtD', vim.lsp.buf.type_definition, bufopts)
-      vim.keymap.set('n', 'grf', vim.lsp.buf.references, bufopts)
-      vim.keymap.set('n', 'g<space>p', vim.lsp.buf.format, bufopts)
-    end
+    local opts = {
+      capabilities = capabilities,
+      on_attach = function(_, bufnr)
+        local bufopts = { silent = true, buffer = bufnr }
+        vim.keymap.set('n', 'gi', vim.lsp.buf.implementation, bufopts)
+        vim.keymap.set('n', 'gtD', vim.lsp.buf.type_definition, bufopts)
+        vim.keymap.set('n', 'grf', vim.lsp.buf.references, bufopts)
+        vim.keymap.set('n', 'g<space>p', vim.lsp.buf.format, bufopts)
+      end
+    }
     nvim_lsp[server_name].setup(opts)
   end
 })
+
+-- DDC settings
+vim.fn['ddc#custom#patch_global']('ui', 'pum')
+vim.fn['ddc#custom#patch_global']('sources', { 'lsp', 'around', 'file' })
+vim.fn['ddc#custom#patch_global']('sourceOptions', {
+  ['_'] = {
+    matchers = { 'matcher_head' },
+    sorters = { 'sorter_rank' },
+    converters = { 'converter_remove_overlap' },
+  },
+  ['lsp'] = {
+    mark = '🗣️',
+    forceCompletionPattern = '\\.\\w*|:\\w*|->\\w*',
+  },
+  -- ['copilot'] = {
+  --   mark = '🤖',
+  --   Copilot also can be included to ddc.vim, but it requires to install ddc-source-copilot
+  -- },
+  ['around'] = {
+    mark = '🌍',
+  },
+  ['file'] = {
+    mark = '🗂️',
+    isVolatile = true,
+    forceCompletionPattern = '\\S/\\S*',
+  },
+})
+
+vim.fn['ddc#custom#patch_global']('sourceParams', {
+  ['lsp'] = {
+    snippetEngine = vim.fn['denops#callback#register'](function(body)
+      return vim.fn['vsnip#anonymous'](body)
+    end),
+    enableResolveItem = true,
+    enableAdditionalTextEdit = true,
+  },
+})
+
+-- LSP capabilities for ddc
+local capabilities = require("ddc_source_lsp").make_client_capabilities()
+
+-- Specific setup for denols
+require('lspconfig').denols.setup({
+  capabilities = capabilities,
+})
+
+vim.fn['ddc#enable']()
 
 -- Autocommand for formatting Python files
 vim.cmd [[autocmd BufWritePre *.py lua vim.lsp.buf.format()]]
 
 -- Key mappings for PUM
-vim.api.nvim_set_keymap('i', '<TAB>', 'pum#visible() ? "<Cmd>call pum#map#confirm()<CR>" : "<TAB>"', { noremap = true, silent = true, expr = true })
+vim.api.nvim_set_keymap('i', '<C-l>', 'pum#visible() ? "<Cmd>call pum#map#confirm()<CR>" : "<C-Space>"', { noremap = true, silent = true, expr = true })
 vim.api.nvim_set_keymap('i', '<C-n>', '<Cmd>call pum#map#select_relative(+1)<CR>', { noremap = true, silent = true })
 vim.api.nvim_set_keymap('i', '<C-p>', '<Cmd>call pum#map#select_relative(-1)<CR>', { noremap = true, silent = true })
+
+-- Copilot settings
+vim.g.copilot_no_tab_map = true
+vim.api.nvim_set_keymap('i', '<Tab>', 'copilot#Accept("<CR>")', { silent = true, expr = true })
 
 -- LSP and diagnostic settings
 vim.o.completeopt = "menuone,noselect"
