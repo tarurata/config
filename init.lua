@@ -19,10 +19,10 @@ vim.opt.rtp:prepend(lazypath)
 vim.g.mapleader = " "
 vim.g.maplocalleader = "\\"
 
+
 -- Setup lazy.nvim
 require("lazy").setup({
   { "mattn/emmet-vim" },                    -- Emmet for HTML and CSS expansion
-  { "ctrlpvim/ctrlp.vim" },                 -- Fuzzy file finder
   { "cohama/lexima.vim" },                  -- Auto-close parentheses, quotes, etc.
   { "tpope/vim-surround" },                 -- Easily delete, change and add surroundings in pairs
   { "scrooloose/nerdcommenter" },           -- Easy commenting of code for various languages
@@ -33,12 +33,8 @@ require("lazy").setup({
   { "easymotion/vim-easymotion" },          -- Vim motions on speed
   { "Shougo/ddc.vim" },                     -- Dark powered asynchronous completion framework
   { "vim-denops/denops.vim" },              -- Vim/Neovim plugin framework written in Deno
---  { "prabirshrestha/vim-lsp" },             -- Async Language Server Protocol plugin
---  { "mattn/vim-lsp-settings" },             -- Auto configurations for Language Server
---  { "mattn/vim-lsp-icons" },                -- Icons for vim-lsp
   { "Shougo/pum.vim" },                     -- Popup menu for Vim
   { "Shougo/ddc-source-around" },           -- Around source for ddc.vim
-  -- { "Shougo/ddc-source-nvim-lsp" },         -- LSP source for ddc.vim !Obsoleted!
   { "Shougo/ddc-source-lsp" },              -- LSP source for ddc.vim
   { "neovim/nvim-lspconfig" },              -- Quickstart configs for Nvim LSP
   { "williamboman/mason.nvim" },            -- Portable package manager for Neovim
@@ -100,7 +96,7 @@ require('mason-lspconfig').setup_handlers({
 vim.fn['ddc#custom#patch_global']('ui', 'pum')
 vim.fn['ddc#custom#patch_global']('sources', { 'lsp', 'around', 'file' })
 vim.fn['ddc#custom#patch_global']('sourceOptions', {
-  ['_'] = {
+  ['_'] = { -- Default options for all sources
     matchers = { 'matcher_head' },
     sorters = { 'sorter_rank' },
     converters = { 'converter_remove_overlap' },
@@ -234,12 +230,12 @@ _G.date = date
 vim.api.nvim_set_keymap('n', '<leader>d', ':lua vim.api.nvim_set_current_line(_G.date())<CR>', { noremap = true, silent = true })
 
 -- Kiwi.nvim setup
-require('kiwi').setup({
+local kiwi = require('kiwi')
+kiwi.setup({
   { name = "personal", path = "/Users/wata/Library/Mobile Documents/iCloud~md~obsidian/Documents/personal-wiki" },
   { name = "work", path = "/Users/wata/work-wiki" }
 })
 
-local kiwi = require('kiwi')
 vim.keymap.set('n', '<leader>ww', kiwi.open_wiki_index, {})
 vim.keymap.set('n', 'T', kiwi.todo.toggle, {})
 vim.keymap.set('n', '<leader>wp', function() kiwi.open_wiki_index("personal", "Open index of personal wiki") end, {})
