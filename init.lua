@@ -30,40 +30,46 @@ Plug 'Shougo/ddc-matcher_head'
 Plug 'Shougo/ddc-sorter_rank'
 Plug 'Shougo/ddc-converter_remove_overlap'
 Plug 'Shougo/ddc-ui-pum'
+Plug 'folke/noice.nvim'
+Plug 'MunifTanjim/nui.nvim'
 Plug 'github/copilot.vim'
-Plug 'serenevoid/kiwi.nvim'
+Plug 'serenevoid/kiwi.nvim', { 'commit': '47894404ca554d48f4e3f1e0bd59642464ca539f' }
+Plug 'rhysd/vim-startuptime'
 call plug#end()
 ]]
 
+-- Noice setup
+require("noice").setup()
+
 -- DDC settings
-vim.cmd [[
-call ddc#custom#patch_global('completionMenu', 'pum.vim')
-call ddc#custom#patch_global('sources', [ 'nvim-lsp', 'around', 'file' ])
-call ddc#custom#patch_global('sourceOptions', {
-\ '_': {
-\ 'matchers': ['matcher_head'],
-\ 'sorters': ['sorter_rank'],
-\ 'converters': ['converter_remove_overlap'],
-\ },
-\ 'nvim-lsp': {
-\ 'mark': 'LSP',
-\ 'forceCompletionPattern': '\.\w*|:\w*|->\w*',
-\ },
-\ 'around': {
-\ 'mark': 'Around'
-\ },
-\ 'file': {
-\ 'mark': 'file',
-\ 'isVolatile': v:true,
-\ 'forceCompletionPattern': '\S/\S*'
-\ }
-\})
-call ddc#custom#patch_global('ui', 'pum')
-call ddc#custom#patch_global('sourceParams', {
-\ 'nvim-lsp': { 'kindLabels': { 'Class': 'c' } },
-\})
-call ddc#enable()
-]]
+vim.fn['ddc#custom#patch_global']('completionMenu', 'pum.vim')
+vim.fn['ddc#custom#patch_global']('sources', { 'around', 'file' })
+-- vim.fn['ddc#custom#patch_global']('sources', { 'nvim-lsp', 'around', 'file' })
+vim.fn['ddc#custom#patch_global']('sourceOptions', {
+  ['_'] = {
+    matchers = { 'matcher_head' },
+    sorters = { 'sorter_rank' },
+    converters = { 'converter_remove_overlap' },
+  },
+  ['nvim-lsp'] = {
+    mark = 'LSP',
+    forceCompletionPattern = '\\.\\w*|:\\w*|->\\w*',
+  },
+  ['around'] = {
+    mark = 'Around',
+  },
+  ['file'] = {
+    mark = 'file',
+    isVolatile = true,
+    forceCompletionPattern = '\\S/\\S*',
+  },
+})
+vim.fn['ddc#custom#patch_global']('ui', 'pum')
+vim.fn['ddc#custom#patch_global']('sourceParams', {
+  ['nvim-lsp'] = { kindLabels = { Class = 'c' } },
+})
+
+vim.fn['ddc#enable']()
 
 -- Mason and LSP settings
 require('mason').setup({
@@ -179,12 +185,11 @@ vim.cmd [[syntax on]]
 vim.o.backspace = "indent,eol,start"
 
 -- Journal header shortcut
-vim.api.nvim_exec([[
-function! Date()
-  return strftime('%y_%m_%d_%a')
-endfunction
-nnoremap <silent> <leader>d :call setline('.', Date())<CR>
-]], false)
+local function date()
+    return os.date('%y_%m_%d_%a')
+end
+_G.date = date
+vim.api.nvim_set_keymap('n', '<leader>d', ':lua vim.api.nvim_set_current_line(_G.date())<CR>', { noremap = true, silent = true })
 
 -- Kiwi.nvim setup
 require('kiwi').setup({
@@ -197,10 +202,9 @@ vim.keymap.set('n', '<leader>ww', kiwi.open_wiki_index, {})
 vim.keymap.set('n', 'T', kiwi.todo.toggle, {})
 vim.keymap.set('n', '<leader>wp', function() kiwi.open_wiki_index("personal", "Open index of personal wiki") end, {})
 
--- Temporary bypass for kiwi.nvim issue
+--  Temporary bypass for kiwi.nvim issue
 local utils = require'kiwi.utils'
 local is_windows = vim.loop.os_uname().version:match('Windows')
-
 utils.get_relative_path = function (config)
   local relative_path = vim.fs.dirname(vim.fn.expand('%:p'))
   if is_windows then
@@ -211,41 +215,67 @@ utils.get_relative_path = function (config)
 end
 
 -- Vale LSP setup
-require'lspconfig'.vale_ls.setup{
+vim.env.VALE_CONFIG_PATH = "/Users/wata/.vale.ini" -- https://github.com/errata-ai/vale-ls/issues/4
+local lspconfig = require('lspconfig')
+lspconfig.vale_ls.setup({
   cmd = {"vale-ls"},
   filetypes = {"markdown", "tex", "text"},
   settings = {
     vale = {
-      Path = "/usr/local/bin/vale"
+      Vale = {
+        cli = "/usr/local/bin/vale",
+        MinAlertLevel = suggestion
+      }
     }
   }
-}
+})
 
 -- Open or create daily file function
-vim.api.nvim_exec([[
-function! OpenOrCreateDailyFile()
-    let l:today = strftime("%y_%m_%d")
-    let l:yesterday = strftime("%y_%m_%d", localtime() - 86400)
-    let l:path = expand('~/Library/Mobile Documents/iCloud~md~obsidian/Documents/personal-wiki/')
-    let l:today_file = l:path . l:today . '.md'
-    let l:yesterday_file = l:path . l:yesterday . '.md'
+local function open_or_create_daily_file()
+    local today = os.date("%y_%m_%d")
+    local yesterday = os.date("%y_%m_%d", os.time() - 86400)
+    local path = vim.fn.expand('~/Library/Mobile Documents/iCloud~md~obsidian/Documents/personal-wiki/')
+    local today_file = path .. today .. '.md'
+    local yesterday_file = path .. yesterday .. '.md'
+    local journal_file = path .. 'Journal.md'
 
-    if filereadable(l:today_file)
-        execute 'edit ' . fnameescape(l:today_file)
+    local function file_exists(file)
+        local f = io.open(file, "r")
+        if f then f:close() end
+        return f ~= nil
+    end
+
+    if file_exists(today_file) then
+        vim.cmd('edit ' .. vim.fn.fnameescape(today_file))
     else
-        if filereadable(l:yesterday_file)
-            call system('cp ' . shellescape(l:yesterday_file) . ' ' . shellescape(l:today_file))
+        if file_exists(yesterday_file) then
+            os.execute('cp ' .. vim.fn.shellescape(yesterday_file) .. ' ' .. vim.fn.shellescape(today_file))
         else
-            call system('touch ' . shellescape(l:today_file))
-        endif
-        execute 'edit ' . fnameescape(l:today_file)
-        call setline(1, '# ' . strftime('%Y/%m/%d'))
-        write
-    endif
-    set filetype=markdown
-endfunction
+            os.execute('touch ' .. vim.fn.shellescape(today_file))
+        end
+        vim.cmd('edit ' .. vim.fn.fnameescape(today_file))
+        vim.fn.setline(1, '# ' .. os.date('%Y/%m/%d'))
+        vim.cmd('write')
 
-if argc() == 1 && argv(0) == 'journal'
-    autocmd VimEnter * call OpenOrCreateDailyFile()
-endif
-]], false)
+        -- Add the new date entry to Journal.md
+        local today_entry = '* [' .. today .. '](./' .. today .. '.md)'
+        local journal_entry_cmd = 'echo ' .. vim.fn.shellescape(today_entry) .. ' >> ' .. vim.fn.shellescape(journal_file)
+        os.execute(journal_entry_cmd)
+    end
+    vim.cmd('set filetype=markdown')
+end
+
+if #vim.fn.argv() == 1 and vim.fn.argv()[1] == 'journal' then
+    vim.api.nvim_create_autocmd("VimEnter", {
+        callback = open_or_create_daily_file
+    })
+end
+
+-- Define custom highlight for strong text in markdown
+vim.cmd [[
+  augroup MyMarkdownHighlights
+    autocmd!
+    autocmd FileType markdown syntax match MarkdownStrong /\*\*.\{-}\*\*/
+    autocmd FileType markdown highlight MarkdownStrong guifg=#FF0000 ctermfg=red
+  augroup END
+]]
