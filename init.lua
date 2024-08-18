@@ -19,13 +19,13 @@ vim.opt.rtp:prepend(lazypath)
 vim.g.mapleader = " "
 vim.g.maplocalleader = "\\"
 
-
 -- Setup lazy.nvim
 require("lazy").setup({
   { "mattn/emmet-vim" },                    -- Emmet for HTML and CSS expansion
   { "cohama/lexima.vim" },                  -- Auto-close parentheses, quotes, etc.
   { "tpope/vim-surround" },                 -- Easily delete, change and add surroundings in pairs
   { "scrooloose/nerdcommenter" },           -- Easy commenting of code for various languages
+  { "scrooloose/nerdtree" },                -- File system explorer
   { "ap/vim-css-color" },                   -- Preview colors in source code
   { "tomasr/molokai" },                     -- Molokai color scheme
   { "junegunn/fzf" },                       -- Fuzzy finder
@@ -63,9 +63,9 @@ require("noice").setup()
 require('mason').setup({
   ui = {
     icons = {
-      package_installed = "✓",
-      package_pending = "➜",
-      package_uninstalled = "✗"
+      package_installed = "⭕",
+      package_pending = "➡️",
+      package_uninstalled = "❌"
     }
   }
 })
@@ -139,6 +139,17 @@ require('lspconfig').denols.setup({
 
 vim.fn['ddc#enable']()
 
+-- LSP settings for Make "vim" global variable available in Lua files
+require('lspconfig').lua_ls.setup({
+    settings = {
+        Lua = {
+            diagnostics = {
+                globals = { 'vim' }
+            }
+        }
+    }
+})
+
 -- Autocommand for formatting Python files
 vim.cmd [[autocmd BufWritePre *.py lua vim.lsp.buf.format()]]
 
@@ -156,7 +167,7 @@ vim.o.completeopt = "menuone,noselect"
 vim.g.lsp_diagnostics_enabled = 1
 vim.g.lsp_diagnostics_echo_cursor = 1
 vim.g.lsp_text_edit_enabled = 0
-vim.g.lsp_diagnostics_virtual_text_enabled = 0
+vim.g.lsp_diagnostics_virtual_text_enabled = 1
 vim.cmd [[highlight link LspErrorHighlight Error]]
 vim.cmd [[highlight link LspWarningHighlight Error]]
 
@@ -214,20 +225,13 @@ vim.api.nvim_set_keymap('n', '<C-e>', ':NERDTreeToggle<CR>', { noremap = true, s
 vim.api.nvim_set_keymap('n', '<leader>s', '<Plug>(easymotion-bd-f2)', {})
 vim.api.nvim_set_keymap('n', '<leader>s', '<Plug>(easymotion-overwin-f2)', {})
 
--- Matchit plugin
+-- Matchit plugin. Jump to the matching characters or tags with %
 vim.cmd [[runtime macros/matchit.vim]]
 
 -- Colorscheme settings
 vim.cmd [[colorscheme molokai]]
 vim.cmd [[syntax on]]
-vim.o.backspace = "indent,eol,start"
-
--- Journal header shortcut
-local function date()
-    return os.date('%y_%m_%d_%a')
-end
-_G.date = date
-vim.api.nvim_set_keymap('n', '<leader>d', ':lua vim.api.nvim_set_current_line(_G.date())<CR>', { noremap = true, silent = true })
+vim.o.backspace = "indent,eol,start" -- Make backspace behave more intuitively in insert mode
 
 -- Kiwi.nvim setup
 local kiwi = require('kiwi')
