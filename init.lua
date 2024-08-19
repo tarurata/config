@@ -51,8 +51,9 @@ require("lazy").setup({
   { "github/copilot.vim" },                 -- GitHub Copilot for Vim
   { "serenevoid/kiwi.nvim", commit = "47894404ca554d48f4e3f1e0bd59642464ca539f" }, -- Neovim plugin for note-taking and personal wiki
   { "rhysd/vim-startuptime" },              -- Measure startup time of Vim
+  { "ellisonleao/gruvbox.nvim", priority = 1000 },
 }, {
-  install = { colorscheme = { "molokai" } },
+--  install = { colorscheme = { "gruvbox" } },
   checker = { enabled = true },
 })
 
@@ -130,7 +131,7 @@ vim.fn['ddc#custom#patch_global']('sourceParams', {
 })
 
 -- LSP capabilities for ddc
-local capabilities = require("ddc_source_lsp").make_client_capabilities()
+capabilities = require("ddc_source_lsp").make_client_capabilities()
 
 -- Specific setup for denols
 require('lspconfig').denols.setup({
@@ -155,7 +156,7 @@ vim.cmd [[autocmd BufWritePre *.py lua vim.lsp.buf.format()]]
 
 -- Key mappings for PUM
 vim.api.nvim_set_keymap('i', '<C-l>', 'pum#visible() ? "<Cmd>call pum#map#confirm()<CR>" : "<C-Space>"', { noremap = true, silent = true, expr = true })
-vim.api.nvim_set_keymap('i', '<C-n>', '<Cmd>call pum#map#select_relative(+1)<CR>', { noremap = true, silent = true })
+-- vim.api.nvim_set_keymap('i', '<C-n>', '<Cmd>call pum#map#select_relative(+1)<CR>', { noremap = true, silent = true })
 vim.api.nvim_set_keymap('i', '<C-p>', '<Cmd>call pum#map#select_relative(-1)<CR>', { noremap = true, silent = true })
 
 -- Copilot settings
@@ -229,7 +230,17 @@ vim.api.nvim_set_keymap('n', '<leader>s', '<Plug>(easymotion-overwin-f2)', {})
 vim.cmd [[runtime macros/matchit.vim]]
 
 -- Colorscheme settings
-vim.cmd [[colorscheme molokai]]
+vim.o.termguicolors = true -- Enable true color support
+vim.api.nvim_command('hi Normal guibg=NONE ctermbg=NONE') -- Set the background to be transparent
+vim.cmd [[colorscheme gruvbox]] -- If you're using a colorscheme, make sure to set it after these settings
+
+-- Ensure the colorscheme doesn't override the transparent background
+vim.api.nvim_command('hi Normal guibg=NONE ctermbg=NONE')
+vim.api.nvim_command('hi NonText guibg=NONE ctermbg=NONE')
+vim.api.nvim_command('hi LineNr guibg=NONE ctermbg=NONE')
+vim.api.nvim_command('hi Folded guibg=NONE ctermbg=NONE')
+vim.api.nvim_command('hi EndOfBuffer guibg=NONE ctermbg=NONE')
+vim.o.termguicolors = true
 vim.cmd [[syntax on]]
 vim.o.backspace = "indent,eol,start" -- Make backspace behave more intuitively in insert mode
 
@@ -321,3 +332,10 @@ vim.cmd [[
     autocmd FileType markdown highlight MarkdownStrong guifg=#FF0000 ctermfg=red
   augroup END
 ]]
+
+-- vim.keymap.set('n', '<leader>e', vim.diagnostic.open_float, { noremap = true, silent = true })
+vim.keymap.set('n', '[d', vim.diagnostic.goto_prev, { noremap = true, silent = true }) -- Move to the previous diagnostic
+vim.keymap.set('n', ']d', vim.diagnostic.goto_next, { noremap = true, silent = true }) -- Move to the next diagnostic
+vim.keymap.set('n', '<leader>q', vim.diagnostic.setloclist, { noremap = true, silent = true }) -- Show diagnostics in the location list
+vim.o.updatetime = 250
+vim.cmd [[autocmd CursorHold,CursorHoldI * lua vim.diagnostic.open_float(nil, {focus=false})]] -- Show diagnostics automatically in hover window
