@@ -201,10 +201,10 @@ vim.api.nvim_set_keymap('n', '<leader>o', ':Files<CR>', { noremap = true, silent
 vim.api.nvim_set_keymap('n', '<leader>h', ':History<CR>', { noremap = true, silent = true })
 
 -- Key mappings for LSP
-vim.api.nvim_set_keymap('n', '<Leader>ld', ':LspDefinition<CR>', { noremap = true, silent = true })
-vim.api.nvim_set_keymap('n', '<Leader>bp', ':bp<CR>', { noremap = true, silent = true })
-vim.api.nvim_set_keymap('n', '<Leader>lh', ':LspHover<CR>', { noremap = true, silent = true })
-vim.api.nvim_set_keymap('n', '<Leader>lr', ':LspReferences<CR>', { noremap = true, silent = true })
+vim.keymap.set('n', '<Leader>ld', vim.lsp.buf.definition, { desc = 'LSP go to definition' })
+vim.keymap.set('n', '<Leader>bp', '<cmd>bp<CR>', { desc = 'Go to previous buffer' })
+vim.keymap.set('n', '<Leader>lh', vim.lsp.buf.hover, { desc = 'LSP hover' })
+vim.keymap.set('n', '<Leader>lr', vim.lsp.buf.references, { desc = 'LSP references' })
 
 -- Clipboard key mappings
 vim.api.nvim_set_keymap('v', '<Leader>y', '"+y', { noremap = true, silent = true })
@@ -255,7 +255,7 @@ vim.keymap.set('n', '<leader>ww', kiwi.open_wiki_index, {})
 vim.keymap.set('n', 'T', kiwi.todo.toggle, {})
 vim.keymap.set('n', '<leader>wp', function() kiwi.open_wiki_index("personal", "Open index of personal wiki") end, {})
 
---  Temporary bypass for kiwi.nvim issue
+-- Temporary bypass for kiwi.nvim issue
 local utils = require'kiwi.utils'
 local is_windows = vim.loop.os_uname().version:match('Windows')
 utils.get_relative_path = function (config)
@@ -333,9 +333,16 @@ vim.cmd [[
   augroup END
 ]]
 
--- vim.keymap.set('n', '<leader>e', vim.diagnostic.open_float, { noremap = true, silent = true })
+vim.keymap.set('n', '<leader>e', vim.diagnostic.open_float, { noremap = true, silent = true })
 vim.keymap.set('n', '[d', vim.diagnostic.goto_prev, { noremap = true, silent = true }) -- Move to the previous diagnostic
 vim.keymap.set('n', ']d', vim.diagnostic.goto_next, { noremap = true, silent = true }) -- Move to the next diagnostic
 vim.keymap.set('n', '<leader>q', vim.diagnostic.setloclist, { noremap = true, silent = true }) -- Show diagnostics in the location list
+-- vim.cmd [[autocmd CursorHold,CursorHoldI * lua vim.diagnostic.open_float(nil, {focus=false})]] -- Show diagnostics automatically in hover window
+
+-- Trigger `checktime` when changing buffers or coming back to vim in terminal.
+vim.o.autoread = true
 vim.o.updatetime = 250
-vim.cmd [[autocmd CursorHold,CursorHoldI * lua vim.diagnostic.open_float(nil, {focus=false})]] -- Show diagnostics automatically in hover window
+vim.api.nvim_create_autocmd({ "FocusGained", "BufEnter", "CursorHold", "CursorHoldI" }, {
+    command = "if mode() != 'c' | checktime | endif",
+    pattern = { "*" },
+})
