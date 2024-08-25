@@ -325,11 +325,13 @@ if #vim.fn.argv() == 1 and vim.fn.argv()[1] == 'journal' then
 end
 
 -- Define custom highlight for strong text in markdown
+-- Highlight between ** and ** | Ignore underscore in words
 vim.cmd [[
   augroup MyMarkdownHighlights
     autocmd!
     autocmd FileType markdown syntax match MarkdownStrong /\*\*.\{-}\*\*/
     autocmd FileType markdown highlight MarkdownStrong guifg=#FF0000 ctermfg=red
+    autocmd FileType markdown syntax match MarkdownError "\w\@<=\w\@="
   augroup END
 ]]
 
