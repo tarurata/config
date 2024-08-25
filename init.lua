@@ -311,7 +311,7 @@ local function open_or_create_daily_file()
         vim.cmd('write')
 
         -- Add the new date entry to Journal.md
-        local today_entry = '* [' .. today .. '](./' .. today .. '.md)'
+        local today_entry = '[' .. today .. '](./' .. today .. '.md)'
         local journal_entry_cmd = 'echo ' .. vim.fn.shellescape(today_entry) .. ' >> ' .. vim.fn.shellescape(journal_file)
         os.execute(journal_entry_cmd)
     end
